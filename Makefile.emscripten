@@ -1,0 +1,15 @@
+OBJS=lib/xmlparse.o lib/xmltok.o lib/xmlrole.o
+HEADERS=lib/expat.h lib/expat_external.h
+CFLAGS=-DHAVE_EXPAT_CONFIG_H
+
+libexpat.a: $(OBJS)
+	llvm-link -o libexpat.bc $(OBJS)
+	rm -f $@
+	emar rcs $@ libexpat.bc
+
+lib/%.o: lib/%.c
+	emcc $(CFLAGS) -I./ -o $@ $<
+
+install: libexpat.a $(HEADERS)
+	cp libexpat.a $(EMSCRIPTEN)/system/local/lib/
+	cp $(HEADERS) $(EMSCRIPTEN)/system/local/include/
